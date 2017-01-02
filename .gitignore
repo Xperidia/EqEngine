@@ -1,5 +1,6 @@
 *.suo
 
-vs/
-Binaries/
-Saved/
+.vs/*
+Binaries/*
+Saved/*
+Intermediate/*
