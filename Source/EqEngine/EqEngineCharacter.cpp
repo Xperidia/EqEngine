@@ -78,14 +78,6 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AEqEngineCharacter::TouchStarted);
-	if (EnableTouchscreenMovement(PlayerInputComponent) == false)
-	{
-		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AEqEngineCharacter::OnFire);
-	}
-
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AEqEngineCharacter::OnResetVR);
-
 	PlayerInputComponent->BindAxis("MoveForward", this, &AEqEngineCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AEqEngineCharacter::MoveRight);
 
