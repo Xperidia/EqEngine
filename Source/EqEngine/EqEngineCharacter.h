@@ -4,6 +4,7 @@
 #include "EqEngineCharacter.generated.h"
 
 class UInputComponent;
+class AEQUsableActor;
 
 UCLASS(config=Game)
 class AEqEngineCharacter : public ACharacter
@@ -29,6 +30,7 @@ public:
 	AEqEngineCharacter();
 
 	virtual void BeginPlay();
+	virtual void Tick(float DeltaTime);
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -54,13 +56,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	class UAnimMontage* FireAnimation;
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "Player Properties")
+		float getHealth() const;
+
+	UFUNCTION()
+		void OnRep_Health();
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
+		float MaxHealth = 100.0f;
+private:
+	// Replicated
+	UPROPERTY(EditDefaultsOnly, Replicated, ReplicatedUsing = OnRep_Health, Category = "Player Properties")
+		float Health;
+
 protected:
 	
 	/** Fires a projectile. */
 	void OnFire();
-
-	/** Resets HMD orientation and position in VR. */
-	void OnResetVR();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
@@ -79,6 +93,8 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser);
 	
 protected:
 	// APawn interface

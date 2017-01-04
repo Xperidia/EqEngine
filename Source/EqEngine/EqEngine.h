@@ -3,7 +3,8 @@
 #ifndef __EQENGINE_H__
 #define __EQENGINE_H__
 
-#include "EngineMinimal.h"
+#include "Engine.h"
+#include "Net/UnrealNetwork.h"
 
 
 #endif

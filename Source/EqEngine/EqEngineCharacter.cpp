@@ -3,6 +3,8 @@
 #include "EqEngine.h"
 #include "EqEngineCharacter.h"
 #include "EqEngineProjectile.h"
+#include "EQUsableActor.h"
+#include "EQFuncs.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/InputSettings.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
@@ -54,6 +56,8 @@ AEqEngineCharacter::AEqEngineCharacter()
 
 	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
+
+	Health = MaxHealth;
 }
 
 void AEqEngineCharacter::BeginPlay()
@@ -67,6 +71,16 @@ void AEqEngineCharacter::BeginPlay()
 	Mesh1P->SetHiddenInGame(false, true);
 }
 
+void AEqEngineCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (Controller && Controller->IsLocalController())
+	{
+		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %f/%f"), Health, MaxHealth));
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -78,6 +92,10 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AEqEngineCharacter::OnFire);
+
+	//PlayerInputComponent->BindAction("Use", IE_Pressed, this, &AEqEngineCharacter::Use);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AEqEngineCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AEqEngineCharacter::MoveRight);
 
@@ -88,6 +106,27 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("TurnRate", this, &AEqEngineCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AEqEngineCharacter::LookUpAtRate);
+}
+
+float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
+{
+	float Dmg = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Health = Health - Dmg;
+
+	return Dmg;
+}
+
+void AEqEngineCharacter::OnRep_Health()
+{
+	
+}
+
+void AEqEngineCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEqEngineCharacter, Health);
 }
 
 void AEqEngineCharacter::OnFire()
@@ -157,4 +196,9 @@ void AEqEngineCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+float AEqEngineCharacter::getHealth() const
+{
+	return Health;
 }
