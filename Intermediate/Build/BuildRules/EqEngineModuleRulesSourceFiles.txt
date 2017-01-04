@@ -1,3 +1,0 @@
-C:\Eqengine\EqEngine\Source\EqEngine\EqEngine.Build.cs
-C:\Eqengine\EqEngine\Source\EqEngine.Target.cs
-C:\Eqengine\EqEngine\Source\EqEngineEditor.Target.cs
