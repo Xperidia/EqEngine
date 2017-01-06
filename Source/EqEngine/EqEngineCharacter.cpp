@@ -75,7 +75,9 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Controller && Controller->IsLocalController())
+	FirstPersonCameraComponent->SetWorldRotation(GetViewRotation());
+
+	if (Controller)
 	{
 		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %i/%i"), (uint32_t) Health, (uint32_t) MaxHealth));
 	}
@@ -92,7 +94,8 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AEqEngineCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AEqEngineCharacter::StartFiring);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AEqEngineCharacter::StopFiring);
 
 	//PlayerInputComponent->BindAction("Use", IE_Pressed, this, &AEqEngineCharacter::Use);
 
@@ -134,15 +137,71 @@ void AEqEngineCharacter::OnRep_Health()
 	
 }
 
+void AEqEngineCharacter::OnRep_PlayerTask()
+{
+	if (PlayerTask == EPlayerTask::Idle)
+	{
+		// nothing
+	}
+	else if (PlayerTask == EPlayerTask::Fire)
+	{
+		OnFire();
+	}
+}
+
+void AEqEngineCharacter::StartFiring()
+{
+	ExecuteTask(EPlayerTask::Fire);
+}
+
+void AEqEngineCharacter::StopFiring()
+{
+	ExecuteTask(EPlayerTask::Idle);
+}
+
+FRotator AEqEngineCharacter::GetViewRotation() const
+{
+	if (Controller)
+	{
+		return Controller->GetControlRotation();
+	}
+
+	return FRotator(RemoteViewPitch / 255.0f * 360.0f, GetActorRotation().Yaw, 0.0f);
+}
+
 void AEqEngineCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AEqEngineCharacter, Health);
+	DOREPLIFETIME(AEqEngineCharacter, PlayerTask);
+}
+
+void AEqEngineCharacter::ExecuteTask(EPlayerTask Task)
+{
+	if (GetNetMode() == NM_Client)
+	{
+		SV_ExecuteTask(Task);
+		return;
+	}
+
+	PlayerTask = Task;
+	OnRep_PlayerTask();
+}
+
+void AEqEngineCharacter::SV_ExecuteTask_Implementation(EPlayerTask Task)
+{
+	ExecuteTask(Task);
+}
+
+bool AEqEngineCharacter::SV_ExecuteTask_Validate(EPlayerTask Task)
+{
+	return true;
 }
 
 void AEqEngineCharacter::OnFire()
 {
+	if (PlayerTask != EPlayerTask::Fire) return;
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
@@ -178,6 +237,8 @@ void AEqEngineCharacter::OnFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(TimerHandler_PlyTask, this, &AEqEngineCharacter::OnFire, 0.1f);
 }
 
 void AEqEngineCharacter::MoveForward(float Value)

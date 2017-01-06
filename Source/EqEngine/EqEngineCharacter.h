@@ -6,6 +6,13 @@
 class UInputComponent;
 class AEQUsableActor;
 
+UENUM()
+enum EPlayerTask
+{
+	Idle,
+	Fire
+};
+
 UCLASS(config=Game)
 class AEqEngineCharacter : public ACharacter
 {
@@ -26,6 +33,11 @@ class AEqEngineCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
+
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerTask)
+		TEnumAsByte<EPlayerTask> PlayerTask;
+
+	FTimerHandle TimerHandler_PlyTask;
 public:
 	AEqEngineCharacter();
 
@@ -63,7 +75,20 @@ public:
 	UFUNCTION()
 		void OnRep_Health();
 
+	UFUNCTION()
+		void OnRep_PlayerTask();
+
+	void StartFiring();
+	void StopFiring();
+
+	void ExecuteTask(EPlayerTask Task);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void SV_ExecuteTask(EPlayerTask Task);
+
 	void OnDeath();
+
+	FRotator GetViewRotation() const override;
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
