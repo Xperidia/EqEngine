@@ -63,6 +63,8 @@ public:
 	UFUNCTION()
 		void OnRep_Health();
 
+	void OnDeath();
+
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
 		float MaxHealth = 100.0f;

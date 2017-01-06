@@ -77,7 +77,7 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 
 	if (Controller && Controller->IsLocalController())
 	{
-		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %f/%f"), Health, MaxHealth));
+		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %i/%i"), (uint32_t) Health, (uint32_t) MaxHealth));
 	}
 }
 
@@ -108,11 +108,23 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AEqEngineCharacter::LookUpAtRate);
 }
 
+void AEqEngineCharacter::OnDeath()
+{
+	Destroy();
+	
+	GetWorld()->GetAuthGameMode()->RestartPlayer(GetWorld()->GetFirstPlayerController());
+}
+
 float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
 {
 	float Dmg = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	Health = Health - Dmg;
+	Health -= Dmg;
+
+	if (Health <= 0)
+	{
+		OnDeath();
+	}
 
 	return Dmg;
 }
