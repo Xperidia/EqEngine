@@ -77,11 +77,6 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FirstPersonCameraComponent->SetWorldRotation(GetViewRotation());
-
-	if (IsLocallyControlled())
-	{
-		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %i/%i"), (uint32_t) Health, (uint32_t) MaxHealth));
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////
