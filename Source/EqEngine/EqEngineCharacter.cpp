@@ -5,6 +5,7 @@
 #include "EqEngineProjectile.h"
 #include "EQUsableActor.h"
 #include "EQFuncs.h"
+#include "EQPlayerController.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/InputSettings.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
@@ -77,7 +78,7 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 
 	FirstPersonCameraComponent->SetWorldRotation(GetViewRotation());
 
-	if (Controller)
+	if (IsLocallyControlled())
 	{
 		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %i/%i"), (uint32_t) Health, (uint32_t) MaxHealth));
 	}
@@ -111,13 +112,6 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AEqEngineCharacter::LookUpAtRate);
 }
 
-void AEqEngineCharacter::OnDeath()
-{
-	Destroy();
-	
-	GetWorld()->GetAuthGameMode()->RestartPlayer(GetWorld()->GetFirstPlayerController());
-}
-
 float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
 {
 	float Dmg = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -126,15 +120,24 @@ float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent con
 
 	if (Health <= 0)
 	{
-		OnDeath();
+		AEQPlayerController * PlayerController = Cast<AEQPlayerController>(Controller);
+	
+		if (PlayerController)
+		{
+			PlayerController->OnDeath();
+		}
+
+		Destroy();
 	}
+
+	OnRep_Health();
 
 	return Dmg;
 }
 
 void AEqEngineCharacter::OnRep_Health()
 {
-	
+	FirstPersonCameraComponent->PostProcessSettings.SceneFringeIntensity = 5.0f - Health * 0.05f;
 }
 
 void AEqEngineCharacter::OnRep_PlayerTask()

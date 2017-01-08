@@ -86,8 +86,6 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 		void SV_ExecuteTask(EPlayerTask Task);
 
-	void OnDeath();
-
 	FRotator GetViewRotation() const override;
 
 public:
