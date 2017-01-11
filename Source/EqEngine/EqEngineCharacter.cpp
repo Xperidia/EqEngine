@@ -94,8 +94,8 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 
 	if (Stamina == 0.0f)
 	{
-		bIsSprinting = false;
-		GetCharacterMovement()->MaxWalkSpeed = 600;
+		PlayerIsSprinting(false);
+		SetPlayerWalkSpeed(600);
 	}
 }
 
