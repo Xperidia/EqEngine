@@ -5,6 +5,7 @@
 #include "EqEngineProjectile.h"
 #include "EQUsableActor.h"
 #include "EQFuncs.h"
+#include "SBase.h"
 #include "EQPlayerController.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/InputSettings.h"
@@ -154,6 +155,9 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AEqEngineCharacter::StartFiring);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AEqEngineCharacter::StopFiring);
 
+	PlayerInputComponent->BindAction("Spell", IE_Pressed, this, &AEqEngineCharacter::StartSpell);
+	PlayerInputComponent->BindAction("Spell", IE_Released, this, &AEqEngineCharacter::StopSpell);
+
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AEqEngineCharacter::StartSprinting);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AEqEngineCharacter::StopSprinting);
 
@@ -169,6 +173,59 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindAxis("TurnRate", this, &AEqEngineCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AEqEngineCharacter::LookUpAtRate);
+}
+
+void AEqEngineCharacter::StartSpell()
+{
+	ExecuteTask(EPlayerTask::Idle);
+	ExecuteTask(EPlayerTask::Spell);
+}
+
+void AEqEngineCharacter::StopSpell()
+{
+	ExecuteTask(EPlayerTask::Idle);
+}
+
+void AEqEngineCharacter::OnShootSpell()
+{
+	if (PlayerTask != EPlayerTask::Spell) return;
+	// try and fire a projectile
+	if (SpellProjectileClass != NULL)
+	{
+		UWorld* const World = GetWorld();
+		if (World != NULL)
+		{
+			const FRotator SpawnRotation = GetControlRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+			// spawn the projectile at the muzzle
+			World->SpawnActor<ASBase>(SpellProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+		}
+	}
+
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+
+	GetWorldTimerManager().SetTimer(TimerHandler_PlyTask, this, &AEqEngineCharacter::OnShootSpell, 0.1f);
 }
 
 float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser)
@@ -218,6 +275,10 @@ void AEqEngineCharacter::OnRep_PlayerTask()
 	else if (PlayerTask == EPlayerTask::Fire)
 	{
 		OnFire();
+	}
+	else if (PlayerTask == EPlayerTask::Spell)
+	{
+		OnShootSpell();
 	}
 }
 

@@ -23,6 +23,19 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
-	
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Spell Properties")
+		class UStaticMeshComponent* StaticMesh;
+
+	/** Sphere collision component */
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+		class USphereComponent* CollisionComp;
+
+	UPROPERTY(EditAnywhere, Category = "Spell Properties")
+		class UParticleSystemComponent* ParticleSys;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+		class UProjectileMovementComponent* ProjectileMovement;
 };

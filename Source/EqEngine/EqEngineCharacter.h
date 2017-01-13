@@ -5,12 +5,14 @@
 
 class UInputComponent;
 class AEQUsableActor;
+class ASBase;
 
 UENUM()
 enum EPlayerTask
 {
 	Idle,
-	Fire
+	Fire,
+	Spell
 };
 
 UCLASS(config=Game)
@@ -62,6 +64,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
 	TSubclassOf<class AEqEngineProjectile> ProjectileClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class ASBase> SpellProjectileClass;
+
+
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	class USoundBase* FireSound;
@@ -88,6 +94,11 @@ public:
 
 	void StartFiring();
 	void StopFiring();
+
+	void StartSpell();
+	void StopSpell();
+	
+	void OnShootSpell();
 
 	void StartSprinting();
 	void StopSprinting();
