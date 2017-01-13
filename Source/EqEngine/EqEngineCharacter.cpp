@@ -59,7 +59,6 @@ AEqEngineCharacter::AEqEngineCharacter()
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
 
 	Health = MaxHealth;
-
 	Stamina = 100.0f;
 }
 
@@ -195,9 +194,19 @@ float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent con
 	return Dmg;
 }
 
+void AEqEngineCharacter::Regen()
+{
+	Health += 10.0f;
+
+	OnRep_Health();
+}
+
 void AEqEngineCharacter::OnRep_Health()
 {
-	FirstPersonCameraComponent->PostProcessSettings.SceneFringeIntensity = 5.0f - Health * 0.05f;
+	if (Health < 100.0f && !GetWorldTimerManager().IsTimerActive(TimerHandler_PlyRegen))
+	{
+		GetWorldTimerManager().SetTimer(TimerHandler_PlyRegen, this, &AEqEngineCharacter::Regen, 5.0f);
+	}
 }
 
 void AEqEngineCharacter::OnRep_PlayerTask()

@@ -38,7 +38,7 @@ class AEqEngineCharacter : public ACharacter
 		TEnumAsByte<EPlayerTask> PlayerTask;
 
 	FTimerHandle TimerHandler_PlyTask;
-	FTimerHandle TimerHandler_Stamina;
+	FTimerHandle TimerHandler_PlyRegen;
 
 public:
 	AEqEngineCharacter();
@@ -91,6 +91,9 @@ public:
 
 	void StartSprinting();
 	void StopSprinting();
+
+	
+	void Regen();
 
 	void ExecuteTask(EPlayerTask Task);
 
