@@ -38,6 +38,8 @@ class AEqEngineCharacter : public ACharacter
 		TEnumAsByte<EPlayerTask> PlayerTask;
 
 	FTimerHandle TimerHandler_PlyTask;
+	FTimerHandle TimerHandler_PlyRegen;
+
 public:
 	AEqEngineCharacter();
 
@@ -72,24 +74,43 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Properties")
 		float getHealth() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Player Properties")
+		float getStamina() const;
+
 	UFUNCTION()
 		void OnRep_Health();
 
 	UFUNCTION()
 		void OnRep_PlayerTask();
 
+	UFUNCTION()
+		void OnRep_Stamina();
+
 	void StartFiring();
 	void StopFiring();
+
+	void StartSprinting();
+	void StopSprinting();
+
+	
+	void Regen();
 
 	void ExecuteTask(EPlayerTask Task);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 		void SV_ExecuteTask(EPlayerTask Task);
 
-	void OnDeath();
+	void PlayerIsSprinting(bool isSprinting);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void SV_PlayerIsSprinting(bool isSprinting);
+
+	void SetPlayerWalkSpeed(int32 speed);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void SV_SetPlayerWalkSpeed(int32 speed);
 
 	FRotator GetViewRotation() const override;
-
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
 		float MaxHealth = 100.0f;
@@ -97,6 +118,12 @@ private:
 	// Replicated
 	UPROPERTY(EditDefaultsOnly, Replicated, ReplicatedUsing = OnRep_Health, Category = "Player Properties")
 		float Health;
+
+	UPROPERTY(EditDefaultsOnly, Replicated, ReplicatedUsing = OnRep_Stamina, Category = "Player Properties")
+		float Stamina;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
+		bool bIsSprinting;
 
 protected:
 	
