@@ -59,6 +59,7 @@ AEqEngineCharacter::AEqEngineCharacter()
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
 
 	Health = MaxHealth;
+	Stamina = 100.0f;
 }
 
 void AEqEngineCharacter::BeginPlay()
@@ -78,10 +79,65 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 
 	FirstPersonCameraComponent->SetWorldRotation(GetViewRotation());
 
-	if (IsLocallyControlled())
+	if (Stamina <= 100.0f && !bIsSprinting)
 	{
-		GEngine->AddOnScreenDebugMessage(0, DeltaTime, FColor::Red, FString::Printf(TEXT("Health: %i/%i"), (uint32_t) Health, (uint32_t) MaxHealth));
+		Stamina += 0.5f;
+		OnRep_Stamina();
 	}
+
+	if (Stamina > 0.0f && bIsSprinting)
+	{
+		Stamina -= 0.5f;
+		OnRep_Stamina();
+	}
+
+	if (Stamina == 0.0f)
+	{
+		PlayerIsSprinting(false);
+		SetPlayerWalkSpeed(600);
+	}
+}
+
+void AEqEngineCharacter::PlayerIsSprinting(bool isSprinting)
+{
+	if (GetNetMode() == NM_Client)
+	{
+		SV_PlayerIsSprinting(isSprinting);
+		return;
+	}
+
+	bIsSprinting = isSprinting;
+}
+
+void AEqEngineCharacter::SetPlayerWalkSpeed(int32 speed)
+{
+	if (GetNetMode() == NM_Client)
+	{
+		SV_SetPlayerWalkSpeed(speed);
+		return;
+	}
+
+	GetCharacterMovement()->MaxWalkSpeed = speed;
+}
+
+void AEqEngineCharacter::SV_PlayerIsSprinting_Implementation(bool isSprinting)
+{
+	bIsSprinting = isSprinting;
+}
+
+bool AEqEngineCharacter::SV_PlayerIsSprinting_Validate(bool isSprinting)
+{
+	return true;
+}
+
+void AEqEngineCharacter::SV_SetPlayerWalkSpeed_Implementation(int32 speed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = speed;
+}
+
+bool AEqEngineCharacter::SV_SetPlayerWalkSpeed_Validate(int32 speed)
+{
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -97,6 +153,9 @@ void AEqEngineCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AEqEngineCharacter::StartFiring);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AEqEngineCharacter::StopFiring);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AEqEngineCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AEqEngineCharacter::StopSprinting);
 
 	//PlayerInputComponent->BindAction("Use", IE_Pressed, this, &AEqEngineCharacter::Use);
 
@@ -135,9 +194,19 @@ float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent con
 	return Dmg;
 }
 
+void AEqEngineCharacter::Regen()
+{
+	Health += 10.0f;
+
+	OnRep_Health();
+}
+
 void AEqEngineCharacter::OnRep_Health()
 {
-	FirstPersonCameraComponent->PostProcessSettings.SceneFringeIntensity = 5.0f - Health * 0.05f;
+	if (Health < 100.0f && !GetWorldTimerManager().IsTimerActive(TimerHandler_PlyRegen))
+	{
+		GetWorldTimerManager().SetTimer(TimerHandler_PlyRegen, this, &AEqEngineCharacter::Regen, 5.0f);
+	}
 }
 
 void AEqEngineCharacter::OnRep_PlayerTask()
@@ -150,6 +219,26 @@ void AEqEngineCharacter::OnRep_PlayerTask()
 	{
 		OnFire();
 	}
+}
+
+void AEqEngineCharacter::OnRep_Stamina()
+{
+
+}
+
+void AEqEngineCharacter::StartSprinting()
+{
+	if (Stamina > 0.0f)
+	{
+		PlayerIsSprinting(true);
+		SetPlayerWalkSpeed(1200);
+	}
+}
+
+void AEqEngineCharacter::StopSprinting()
+{
+	PlayerIsSprinting(false);
+	SetPlayerWalkSpeed(600);
 }
 
 void AEqEngineCharacter::StartFiring()
@@ -178,6 +267,7 @@ void AEqEngineCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 	DOREPLIFETIME(AEqEngineCharacter, Health);
 	DOREPLIFETIME(AEqEngineCharacter, PlayerTask);
+	DOREPLIFETIME(AEqEngineCharacter, Stamina);
 }
 
 void AEqEngineCharacter::ExecuteTask(EPlayerTask Task)
@@ -277,4 +367,9 @@ void AEqEngineCharacter::LookUpAtRate(float Rate)
 float AEqEngineCharacter::getHealth() const
 {
 	return Health;
+}
+
+float AEqEngineCharacter::getStamina() const
+{
+	return Stamina;
 }
