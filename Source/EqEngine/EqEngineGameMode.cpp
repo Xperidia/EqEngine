@@ -4,7 +4,6 @@
 #include "EqEngineGameMode.h"
 #include "EqEngineHUD.h"
 #include "EqEngineCharacter.h"
-#include "EQPlayerController.h"
 
 AEqEngineGameMode::AEqEngineGameMode()
 	: Super()
@@ -15,6 +14,4 @@ AEqEngineGameMode::AEqEngineGameMode()
 
 	// use our custom HUD class
 	HUDClass = AEqEngineHUD::StaticClass();
-
-	PlayerControllerClass = AEQPlayerController::StaticClass();
 }

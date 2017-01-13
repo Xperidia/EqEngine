@@ -1,22 +1,16 @@
 {
- 	FileVersion 3,
- 	EngineAssociation 4.14,
- 	Description ,
- 	Modules [
- 		{
- 			Name EqEngine,
- 			Type Runtime,
- 			LoadingPhase Default,
- 			AdditionalDependencies [
- 				Engine
- 			]
- 		}
- 	],
- 	Plugins [
- 		{
- 			Name SCUE4,
- 			Enabled true,
- 			MarketplaceURL com.epicgames.launcheruemarketplacecontentcff7ca410375488fb0d13221b7446041
- 		}
- 	]
- }
+	"FileVersion": 3,
+	"EngineAssociation": "4.14",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "EqEngine",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	]
+}
