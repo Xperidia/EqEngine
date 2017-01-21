@@ -22,8 +22,6 @@ ASBase::ASBase()
 	// Set as root component
 	RootComponent = CollisionComp;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-
 	ParticleSys = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSys"));
 	ParticleSys->SetupAttachment(RootComponent);
 
