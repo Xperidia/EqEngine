@@ -83,6 +83,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Properties")
 		float getStamina() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Player Properties")
+		FString getPlayerName() const;
+
 	UFUNCTION()
 		void OnRep_Health();
 
@@ -135,6 +138,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
 		bool bIsSprinting;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
+		FString PlayerName;
 
 protected:
 	

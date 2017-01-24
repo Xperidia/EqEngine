@@ -12,6 +12,9 @@
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "MotionControllerComponent.h"
 
+#include <stdlib.h>
+#include <time.h>
+
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
@@ -61,6 +64,11 @@ AEqEngineCharacter::AEqEngineCharacter()
 
 	Health = MaxHealth;
 	Stamina = 100.0f;
+
+	// Random player number
+	srand(time(NULL));
+
+	PlayerName = "Player" + rand() % 100+1;
 }
 
 void AEqEngineCharacter::BeginPlay()
@@ -433,4 +441,9 @@ float AEqEngineCharacter::getHealth() const
 float AEqEngineCharacter::getStamina() const
 {
 	return Stamina;
+}
+
+FString AEqEngineCharacter::getPlayerName() const
+{
+	return PlayerName;
 }
