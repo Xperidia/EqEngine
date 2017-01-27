@@ -447,3 +447,14 @@ FString AEqEngineCharacter::getPlayerName() const
 {
 	return PlayerName;
 }
+
+void AEqEngineCharacter::OnRep_PlayerName()
+{
+
+}
+
+void AEqEngineCharacter::setPlayerName(FString NewPlayerName)
+{
+	PlayerName = NewPlayerName;
+	OnRep_PlayerName();
+}

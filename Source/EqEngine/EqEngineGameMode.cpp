@@ -5,6 +5,8 @@
 #include "EqEngineHUD.h"
 #include "EqEngineCharacter.h"
 #include "EQPlayerController.h"
+#include "EQGameStateBase.h"
+#include "EQPlayerState.h"
 
 AEqEngineGameMode::AEqEngineGameMode()
 	: Super()
@@ -17,4 +19,6 @@ AEqEngineGameMode::AEqEngineGameMode()
 	HUDClass = AEqEngineHUD::StaticClass();
 
 	PlayerControllerClass = AEQPlayerController::StaticClass();
+	GameStateClass = AEQGameStateBase::StaticClass();
+	PlayerStateClass = AEQPlayerState::StaticClass();
 }

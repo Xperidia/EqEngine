@@ -80,11 +80,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Properties")
 		float getHealth() const;
 
+
 	UFUNCTION(BlueprintCallable, Category = "Player Properties")
 		float getStamina() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Properties")
 		FString getPlayerName() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Player Properties")
+		void setPlayerName(FString NewPlayerName);
 
 	UFUNCTION()
 		void OnRep_Health();
@@ -94,6 +98,9 @@ public:
 
 	UFUNCTION()
 		void OnRep_Stamina();
+
+	UFUNCTION()
+		void OnRep_PlayerName();
 
 	void StartFiring();
 	void StopFiring();
@@ -139,7 +146,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
 		bool bIsSprinting;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player Properties")
+	UPROPERTY(EditDefaultsOnly, Replicated, ReplicatedUsing = OnRep_PlayerName, Category = "Player Properties")
 		FString PlayerName;
 
 protected:
