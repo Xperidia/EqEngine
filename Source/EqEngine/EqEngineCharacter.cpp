@@ -276,6 +276,19 @@ void AEqEngineCharacter::OnRep_Health()
 
 void AEqEngineCharacter::OnRep_PlayerTask()
 {
+	switch (PlayerTask)
+	{
+	case EPlayerTask::Idle:
+		break;
+	case EPlayerTask::Fire:
+		OnFire();
+		break;
+	case EPlayerTask::Spell:
+		OnShootSpell();
+		break;
+	}
+
+	/*
 	if (PlayerTask == EPlayerTask::Idle)
 	{
 		// nothing
@@ -288,6 +301,7 @@ void AEqEngineCharacter::OnRep_PlayerTask()
 	{
 		OnShootSpell();
 	}
+	*/
 }
 
 void AEqEngineCharacter::OnRep_Stamina()
@@ -450,7 +464,9 @@ FString AEqEngineCharacter::getPlayerName() const
 
 void AEqEngineCharacter::OnRep_PlayerName()
 {
-
+#ifdef WITH_EDITOR
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("New player name: %s"), *PlayerName));
+#endif
 }
 
 void AEqEngineCharacter::setPlayerName(FString NewPlayerName)
