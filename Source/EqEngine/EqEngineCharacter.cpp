@@ -4,7 +4,6 @@
 #include "EqEngineCharacter.h"
 #include "EqEngineProjectile.h"
 #include "EQUsableActor.h"
-#include "EQFuncs.h"
 #include "SBase.h"
 #include "EQPlayerController.h"
 #include "Animation/AnimInstance.h"
