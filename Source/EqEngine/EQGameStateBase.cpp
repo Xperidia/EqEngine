@@ -15,5 +15,10 @@ int32 AEQGameStateBase::getCurrentPlayerState()
 
 void AEQGameStateBase::setCurrentPlayerState(int32 NewState)
 {
+	if (NewState > 2 || NewState < 0)
+	{
+		CurrentPlayerState = 0;
+	}
+
 	CurrentPlayerState = NewState;
 }
