@@ -28,7 +28,7 @@ AEqEngineCharacter::AEqEngineCharacter()
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 
-	// Create a CameraComponent	
+	// Create a CameraComponent
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->RelativeLocation = FVector(-39.56f, 1.75f, 64.f); // Position the camera
@@ -58,7 +58,7 @@ AEqEngineCharacter::AEqEngineCharacter()
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
 
-	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 
+	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
 
 	Health = MaxHealth;
@@ -72,7 +72,7 @@ AEqEngineCharacter::AEqEngineCharacter()
 
 void AEqEngineCharacter::BeginPlay()
 {
-	// Call the base class  
+	// Call the base class
 	Super::BeginPlay();
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
@@ -87,18 +87,24 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 
 	FirstPersonCameraComponent->SetWorldRotation(GetViewRotation());
 
+	/* Check si la stamina est en dessous de 100 et que le joueur ne sprint pas
+	*	alors on regen la stamina */
 	if (Stamina <= 100.0f && !bIsSprinting)
 	{
 		Stamina += 0.5f;
 		OnRep_Stamina();
 	}
 
+	/* Check si la stamina est au dessus de 0 et que le joueur sprint pas
+	*	alors on descend la stamina */
 	if (Stamina > 0.0f && bIsSprinting)
 	{
 		Stamina -= 0.5f;
 		OnRep_Stamina();
 	}
 
+	/* Check si la stamina est égale à 0
+	*	alors on force l'arrêt du sprint */
 	if (Stamina == 0.0f)
 	{
 		PlayerIsSprinting(false);
@@ -106,6 +112,7 @@ void AEqEngineCharacter::Tick(float DeltaTime)
 	}
 }
 
+/** Set la variable bIsSprinting */
 void AEqEngineCharacter::PlayerIsSprinting(bool isSprinting)
 {
 	if (GetNetMode() == NM_Client)
@@ -117,6 +124,7 @@ void AEqEngineCharacter::PlayerIsSprinting(bool isSprinting)
 	bIsSprinting = isSprinting;
 }
 
+/** Set la vitesse du joueur */
 void AEqEngineCharacter::SetPlayerWalkSpeed(int32 speed)
 {
 	if (GetNetMode() == NM_Client)
@@ -128,6 +136,7 @@ void AEqEngineCharacter::SetPlayerWalkSpeed(int32 speed)
 	GetCharacterMovement()->MaxWalkSpeed = speed;
 }
 
+/** L'implémentation pour le serveur */
 void AEqEngineCharacter::SV_PlayerIsSprinting_Implementation(bool isSprinting)
 {
 	bIsSprinting = isSprinting;
@@ -138,6 +147,7 @@ bool AEqEngineCharacter::SV_PlayerIsSprinting_Validate(bool isSprinting)
 	return true;
 }
 
+/** L'implémentation pour le serveur */
 void AEqEngineCharacter::SV_SetPlayerWalkSpeed_Implementation(int32 speed)
 {
 	GetCharacterMovement()->MaxWalkSpeed = speed;
@@ -244,7 +254,7 @@ float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent con
 	if (Health <= 0)
 	{
 		AEQPlayerController * PlayerController = Cast<AEQPlayerController>(Controller);
-	
+
 		if (PlayerController)
 		{
 			PlayerController->OnDeath();
@@ -258,6 +268,7 @@ float AEqEngineCharacter::TakeDamage(float DamageAmount, struct FDamageEvent con
 	return Dmg;
 }
 
+/** Régénération (simple) */
 void AEqEngineCharacter::Regen()
 {
 	Health += 10.0f;

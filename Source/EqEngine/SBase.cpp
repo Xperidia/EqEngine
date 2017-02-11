@@ -41,7 +41,7 @@ ASBase::ASBase()
 void ASBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -51,6 +51,7 @@ void ASBase::Tick( float DeltaTime )
 
 }
 
+/** Lorsuqe la spell touche quelque chose, on le "pousse" */
 void ASBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics

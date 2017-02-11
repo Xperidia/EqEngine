@@ -13,7 +13,6 @@ AEqEngineHUD::AEqEngineHUD()
 	CrosshairTex = CrosshiarTexObj.Object;
 }
 
-
 void AEqEngineHUD::DrawHUD()
 {
 	Super::DrawHUD();
@@ -32,4 +31,3 @@ void AEqEngineHUD::DrawHUD()
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
 }
-
