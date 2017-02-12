@@ -24,9 +24,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player State")
 		void setCurrentPlayerState(int32 NewState);
 
+	UFUNCTION(BlueprintCallable, Category = "Credits")
+		int32 GetCredits();
+
+	UFUNCTION(BlueprintCallable, Category = "Credits")
+		void GiveCredits(int32 Amount);
+	
+	UFUNCTION(BlueprintCallable, Category = "Credits")
+		void RemoveCredits(int32 Amount);
+
+	UFUNCTION(BlueprintCallable, Category = "Credits")
+		void SetCredits(int32 Amount);
+
 private:
 	UPROPERTY(EditAnywhere)
 		int32 CurrentPlayerState;
+
+	UPROPERTY(EditAnywhere)
+		int32 Credits;
 	
 	
 };
