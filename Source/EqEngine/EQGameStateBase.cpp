@@ -22,3 +22,24 @@ void AEQGameStateBase::setCurrentPlayerState(int32 NewState)
 
 	CurrentPlayerState = NewState;
 }
+
+
+int32 AEQGameStateBase::GetCredits()
+{
+	return Credits;
+}
+
+void AEQGameStateBase::GiveCredits(int32 Amount)
+{
+	Credits += Amount;
+}
+
+void AEQGameStateBase::RemoveCredits(int32 Amount)
+{
+	Credits -= Amount;
+}
+
+void AEQGameStateBase::SetCredits(int32 Amount)
+{
+	Credits = Amount;
+}
