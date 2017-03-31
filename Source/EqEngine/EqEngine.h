@@ -5,6 +5,6 @@
 
 #include "Engine.h"
 #include "Net/UnrealNetwork.h"
-
+#include "Blueprint/UserWidget.h"
 
 #endif

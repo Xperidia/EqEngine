@@ -6,8 +6,9 @@ public class EqEngine : ModuleRules
 {
 	public EqEngine(TargetInfo Target)
 	{
-        MinFilesUsingPrecompiledHeaderOverride = 1;
-        bFasterWithoutUnity = true;
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+        //MinFilesUsingPrecompiledHeaderOverride = 1;
+        //bFasterWithoutUnity = true;
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay"});
+        PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore" });
     }
 }
