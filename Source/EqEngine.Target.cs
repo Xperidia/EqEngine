@@ -8,6 +8,7 @@ public class EqEngineTarget : TargetRules
 	public EqEngineTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+        bUsesSteam = true;
 	}
 
 	//

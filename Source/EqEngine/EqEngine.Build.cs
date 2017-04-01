@@ -8,7 +8,16 @@ public class EqEngine : ModuleRules
 	{
         //MinFilesUsingPrecompiledHeaderOverride = 1;
         //bFasterWithoutUnity = true;
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay"});
+        PublicDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject",
+            "Engine",
+            "InputCore",
+            "HeadMountedDisplay",
+            "OnlineSubsystem",
+            "OnlineSubsystemUtils" }); 
         PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore" });
+
+        DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
     }
 }
